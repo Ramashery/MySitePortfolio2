@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Craft | Portfolio</title>
+    <meta name="description" content="Professional websites for small businesses">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <style>
+        /* --- Global Variables --- */
+        :root {
+            --color-bg: #030409;
+            --color-text: #eaf6ff;
+            --color-accent: #b8d8e8;
+            --color-card: rgba(25, 29, 45, 0.4);
+            --color-border: rgba(184, 216, 232, 0.2);
+            --font-main: 'Cormorant Garamond', serif;
+            --header-height: 80px;
+        }
+
+        /* --- Base Styles --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Preloader --- */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--color-accent);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Crystal Canvas --- */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+
+        /* --- Main content --- */
+        main {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 30px;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        
+        body.modal-is-open main,
+        body.nav-is-open main {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
+        /* --- Sections and Animations --- */
+        section {
+            margin-bottom: 120px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            perspective: 1000px;
+        }
+
+        section::after {
+            content: "";
+            display: block;
+            height: 1px;
+            width: 0;
+            background: var(--color-accent);
+            margin: 80px auto 0;
+            transition: width 1.2s ease-out;
+        }
+
+        section.is-visible::after {
+            width: 100%;
+        }
+
+        /* Hero section animations */
+        @keyframes heroAppear {
+            0% { opacity: 0; transform: translateY(40px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .hero h1 {
+            animation: heroAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .hero p {
+            animation: heroAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+            opacity: 0;
+        }
+
+        .hero .cta-button {
+            animation: heroAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+            opacity: 0;
+        }
+
+        /* Blog cards animations */
+        @keyframes assembleCard {
+            0% {
+                opacity: 0;
+                transform: translateY(80px) rotateZ(-5deg) scale(0.8);
+                box-shadow: 0 20px 40px rgba(184, 216, 232, 0);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-10px) rotateZ(2deg) scale(1.05);
+                box-shadow: 0 20px 40px rgba(184, 216, 232, 0.3);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateZ(0) scale(1);
+                box-shadow: 0 10px 30px rgba(184, 216, 232, 0.3);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .blog-card {
+            opacity: 0;
+            transform-style: preserve-3d;
+            animation: 
+                assembleCard 0.7s ease-out forwards,
+                fadeIn 0.4s ease-out 0.3s forwards;
+        }
+
+        /* --- Blog Cards --- */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .blog-card {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px) scale(1.02) !important;
+            border-color: var(--color-accent);
+            box-shadow: 0 10px 30px rgba(184, 216, 232, 0.3);
+        }
+
+        .blog-card__image {
+            height: 200px;
+            background: linear-gradient(135deg, rgba(184, 216, 232, 0.1), rgba(25, 29, 45, 0.7));
+            transition: all 0.4s ease-out;
+        }
+
+        .blog-card:hover .blog-card__image {
+            background: linear-gradient(135deg, rgba(184, 216, 232, 0.2), rgba(25, 29, 45, 0.6));
+        }
+
+        .blog-card__content {
+            padding: 25px;
+        }
+
+        .blog-card h3 {
+            margin: 0 0 10px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease-out;
+        }
+
+        .blog-card:hover h3 {
+            color: var(--color-accent);
+        }
+
+        .blog-card time {
+            display: block;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .blog-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* --- Modern Menu --- */
+        .menu-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 1000;
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            width: 30px;
+            height: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.4s;
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .menu-toggle .bar {
+            background: #FFFFFF;
+            height: 2px;
+            width: 100%;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transform-origin: right;
+        }
+
+        .menu-toggle.is-active .bar:nth-child(1) {
+            transform: translateY(11px) rotate(-45deg);
+            background: var(--color-accent);
+        }
+
+        .menu-toggle.is-active .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.is-active .bar:nth-child(3) {
+            transform: translateY(-11px) rotate(45deg);
+            background: var(--color-accent);
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            height: 100vh;
+            background: transparent;
+            z-index: 999;
+            transition: right 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+            overflow: hidden;
+        }
+
+        .nav-overlay.is-active {
+            right: 0;
+        }
+
+        .nav-menu {
+            padding: 100px 40px;
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 25px;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.4s ease-out;
+        }
+
+        .nav-overlay.is-active .nav-menu li {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .nav-menu li:nth-child(1) { transition-delay: 0.1s; }
+        .nav-menu li:nth-child(2) { transition-delay: 0.2s; }
+        .nav-menu li:nth-child(3) { transition-delay: 0.3s; }
+        .nav-menu li:nth-child(4) { transition-delay: 0.4s; }
+
+        .nav-menu a {
+            color: var(--color-text);
+            font-size: 1.8rem;
+            position: relative;
+            padding-bottom: 5px;
+            transition: all 0.3s ease-out;
+        }
+
+        .nav-menu a:hover {
+            color: var(--color-accent);
+            transform: translateX(5px);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--color-accent);
+            transition: width 0.4s;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            margin: 0 0 20px;
+            line-height: 1.1;
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(184, 216, 232, 0.4);
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        /* --- CTA Button --- */
+        .cta-button {
+            display: inline-block;
+            padding: 14px 32px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--color-text);
+            border: 1px solid var(--color-accent);
+            background-color: rgba(44, 75, 90, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            border-color: var(--color-text);
+            box-shadow: 0 5px 25px 5px rgba(184, 216, 232, 0.4);
+        }
+
+        /* --- Modal Windows --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .modal.is-active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal__content {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+        }
+        
+        .modal__content h2,
+        .modal__content p,
+        .modal__close {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal.is-active .modal__content h2,
+        .modal.is-active .modal__content p,
+        .modal.is-active .modal__close {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .modal.is-active .modal__close { transition-delay: 0.2s; }
+        .modal.is-active .modal__content h2 { transition-delay: 0.3s; }
+        .modal.is-active .modal__content p { transition-delay: 0.4s; }
+
+        .modal__content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--color-accent);
+        }
+
+        .modal__content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Updated modal close button styles */
+        .modal__close {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 30px;
+            height: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0;
+            z-index: 10;
+        }
+
+        .modal__close .bar {
+            background: var(--color-text);
+            height: 2px;
+            width: 100%;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transform-origin: left;
+        }
+
+        .modal__close .bar:nth-child(1) {
+            transform: translateY(11px) rotate(45deg);
+        }
+
+        .modal__close .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .modal__close .bar:nth-child(3) {
+            transform: translateY(-11px) rotate(-45deg);
+        }
+
+        .modal__close:hover .bar {
+            background: var(--color-accent);
+            transform: translateX(-5px);
+        }
+
+        /* Text animation styles */
+        @keyframes letterAppear {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 span, 
+        .hero p span,
+        .blog-card h3 span,
+        .blog-card p span {
+            display: inline-block;
+            opacity: 0;
+            animation: letterAppear 0.5s forwards;
+        }
+
+        /* --- Admin Panel --- */
+        #admin-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 4, 9, 0.95);
+            z-index: 10000;
+            display: none;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        #admin-panel.active {
+            display: block;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: rgba(25, 29, 45, 0.8);
+            padding: 30px;
+            border-right: 1px solid var(--color-border);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .admin-content {
+            flex: 1;
+            padding: 40px;
+            background: rgba(25, 29, 45, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .admin-tab.active {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .nav-overlay {
+                width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-container {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            .modal__content {
+                padding: 20px;
+            }
+
+            .modal__content h2 {
+                font-size: 2rem;
+            }
+
+            .modal__close {
+                left: 20px;
+                bottom: 20px;
+            }
+
+            /* Mobile animation adjustments */
+            .hero h1, .hero p, .cta-button {
+                animation-duration: 1s !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 60px 15px;
+            }
+
+            section {
+                margin-bottom: 60px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-menu {
+                padding: 80px 20px;
+            }
+
+            .nav-menu a {
+                font-size: 1.5rem;
+            }
+
+            .modal__close {
+                left: 15px;
+                bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Modern Menu -->
+    <button class="menu-toggle" aria-label="Toggle menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </button>
+
+    <div class="nav-overlay">
+        <ul class="nav-menu">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#portfolio">Portfolio</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#" id="admin-toggle">Admin</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero">
+            <h1>Crafting Digital Excellence</h1>
+            <p>We create bespoke websites that elevate small businesses through elegant design and cutting-edge technology.</p>
+            <a href="#contact" class="cta-button">Start Your Project</a>
+        </section>
+
+        <!-- Blog Section -->
+        <section id="blog">
+            <h2>Latest Insights</h2>
+            <div class="blog-grid">
+                <article class="blog-card" data-modal="article1">
+                    <div class="blog-card__image"></div>
+                    <div class="blog-card__content">
+                        <h3>10 Principles of Effective Web Design</h3>
+                        <time>June 15, 2023</time>
+                        <p>Discover the fundamental principles that make websites both beautiful and functional.</p>
+                    </div>
+                </article>
+
+                <article class="blog-card" data-modal="article2">
+                    <div class="blog-card__image"></div>
+                    <div class="blog-card__content">
+                        <h3>SEO Strategies for Small Businesses</h3>
+                        <time>May 28, 2023</time>
+                        <p>Learn how to improve your online visibility without breaking the bank.</p>
+                    </div>
+                </article>
+
+                <article class="blog-card" data-modal="article3">
+                    <div class="blog-card__image"></div>
+                    <div class="blog-card__content">
+                        <h3>The Psychology of Color in Web Design</h3>
+                        <time>April 10, 2023</time>
+                        <p>How color choices influence user behavior and perception of your brand.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- Blog Modals -->
+    <div class="modal" id="article1">
+        <div class="modal__content">
+            <button class="modal__close">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <h2>10 Principles of Effective Web Design</h2>
+            <p>Теперь контент "парит" в воздухе над фоном. Главная страница исчезает. Каждый элемент появляется с анимацией.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="article2">
+        <div class="modal__content">
+            <button class="modal__close">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <h2>SEO Strategies for Small Businesses</h2>
+            <p>Это модальное окно полностью соответствует изначальному запросу.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="article3">
+        <div class="modal__content">
+            <button class="modal__close">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <h2>The Psychology of Color in Web Design</h2>
+            <p>Фон не размыт, а блок контента абсолютно прозрачен.</p>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel">
+        <div class="admin-container">
+            <div class="admin-sidebar">
+                <h3>Admin Panel</h3>
+                <ul>
+                    <li class="admin-tab active" data-tab="content">Content</li>
+                    <li class="admin-tab" data-tab="design">Design</li>
+                    <li class="admin-tab" data-tab="blog">Blog</li>
+                    <li class="admin-tab" data-tab="settings">Settings</li>
+                </ul>
+            </div>
+            <div class="admin-content">
+                <div class="tab-content active" data-tab="content"><h2>Content Management</h2></div>
+                <div class="tab-content" data-tab="design"><h2>Design Settings</h2></div>
+                <div class="tab-content" data-tab="blog"><h2>Blog Management</h2></div>
+                <div class="tab-content" data-tab="settings"><h2>Settings</h2></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        
+        // Wait for window load to hide preloader
+        window.addEventListener('load', () => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+            }, 500);
+            
+            // Initialize text animations
+            animateTextElements();
+        });
+
+        // --- THREE.JS SCENE SETUP ---
+        let crystalMaterial;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+        const canvas = document.getElementById("webgl-canvas");
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const ambientLight = new THREE.AmbientLight(0x404040, 2);
+        scene.add(ambientLight);
+        const pointLight1 = new THREE.PointLight(0x00aaff, 30, 20);
+        pointLight1.position.set(5, 5, 5);
+        scene.add(pointLight1);
+        const crystalGroup = new THREE.Group();
+        scene.add(crystalGroup);
+        
+        function createCrystalMaterial() {
+            return new THREE.ShaderMaterial({
+                uniforms: { 
+                    time: { value: 0 }, 
+                    color1: { value: new THREE.Color(0xb8d8e8) }, 
+                    color2: { value: new THREE.Color(0x1d2a3a) },
+                },
+                vertexShader: `varying vec3 vNormal; varying vec3 vPosition; void main() { vNormal = normalize(normalMatrix * normal); vPosition = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+                fragmentShader: `uniform float time; uniform vec3 color1; uniform vec3 color2; varying vec3 vNormal; float snoise(vec3 v){ const vec2 C = vec2(1.0/6.0, 1.0/3.0) ; const vec4 D = vec4(0.0, 0.5, 1.0, 2.0); vec3 i = floor(v + dot(v, C.yyy) ); vec3 x0 = v - i + dot(i, C.xxx) ; vec3 g = step(x0.yzx, x0.xyz); vec3 l = 1.0 - g; vec3 i1 = min( g.xyz, l.zxy ); vec3 i2 = max( g.xyz, l.zxy ); vec3 x1 = x0 - i1 + C.xxx; vec3 x2 = x0 - i2 + C.yyy; vec3 x3 = x0 - D.yyy; i = mod(i, 289.0); vec4 p = mod(((i.z + vec4(0.0, i1.z, i2.z, 1.0 ))*34.0+1.0)* (i.z + vec4(0.0, i1.z, i2.z, 1.0 )) + i.y + vec4(0.0, i1.y, i2.y, 1.0 ), 289.0); p = mod(((p)*34.0+1.0)*(p) + i.x + vec4(0.0, i1.x, i2.x, 1.0 ), 289.0); vec4 j = p - 49.0 * floor(p * (1.0/7.0) * (1.0/7.0)); vec4 x_ = floor(j * (1.0/7.0)); vec4 y_ = floor(j - 7.0 * x_ ); vec4 x = x_ * (2.0/7.0) - 1.0 + (1.0/7.0); vec4 y = y_ * (2.0/7.0) - 1.0 + (1.0/7.0); vec4 h = 1.0 - abs(x) - abs(y); vec4 b0 = vec4( x.xy, y.xy ); vec4 b1 = vec4( x.zw, y.zw ); vec4 s0 = floor(b0)*2.0 + 1.0; vec4 s1 = floor(b1)*2.0 + 1.0; vec4 sh = -step(h, vec4(0.0)); vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ; vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ; vec3 p0 = vec3(a0.xy,h.x); vec3 p1 = vec3(a0.zw,h.y); vec3 p2 = vec3(a1.xy,h.z); vec3 p3 = vec3(a1.zw,h.w); vec4 norm = inversesqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3))); p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w; vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0); m = m * m; return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) ); } void main() { float noise = snoise(vNormal * 3.0 + time * 0.1); vec3 baseColor = mix(color1, color2, vNormal.y * 0.5 + 0.5); float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 3.0); vec3 finalColor = baseColor + fresnel * vec3(0.8, 0.9, 1.0) * 0.5; finalColor += noise * 0.2; gl_FragColor = vec4(finalColor, fresnel * 0.8 + 0.2); }`,
+                transparent: true, 
+                blending: THREE.AdditiveBlending, 
+                depthWrite: false,
+            });
+        }
+        
+        crystalMaterial = createCrystalMaterial();
+        const coreGeometry = new THREE.IcosahedronGeometry(0.8, 1);
+        const coreCrystal = new THREE.Mesh(coreGeometry, crystalMaterial);
+        crystalGroup.add(coreCrystal);
+        
+        let branches = [];
+        let crystalGrowth = 0;
+        
+        function addBranch() {
+            if (branches.length > 50) return;
+            const size = 0.1 + Math.random() * 0.4;
+            const geometry = new THREE.IcosahedronGeometry(size, 0);
+            const branch = new THREE.Mesh(geometry, crystalMaterial);
+            const phi = Math.random() * Math.PI * 2;
+            const theta = Math.acos(Math.random() * 2 - 1);
+            const radius = 1 + Math.random() * crystalGrowth;
+            branch.position.set( radius * Math.sin(theta) * Math.cos(phi), radius * Math.sin(theta) * Math.sin(phi), radius * Math.cos(theta) );
+            branch.rotation.set(Math.random(), Math.random(), Math.random());
+            branch.scale.set(0.01, 0.01, 0.01);
+            crystalGroup.add(branch);
+            branches.push({ mesh: branch, life: 0, maxLife: 0.5 + Math.random() * 1.5 });
+        }
+        
+        const clock = new THREE.Clock();
+        let scrollFraction = 0;
+        let introComplete = false;
+        const introDuration = 5; // seconds for intro animation
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            crystalMaterial.uniforms.time.value = elapsedTime;
+
+            // --- Intro Animation & Scroll Animation Logic ---
+            let introProgress = 1.0;
+            if (!introComplete) {
+                introProgress = Math.min(elapsedTime / introDuration, 1.0);
+                if (introProgress >= 1.0) {
+                    introComplete = true;
+                }
+            }
+
+            // Calculate growth from both intro and scroll, and use the larger value
+            const introGrowth = introProgress * 1.5;
+            const scrollGrowth = Math.min(scrollFraction * 5, 2.5);
+            crystalGrowth = Math.max(introGrowth, scrollGrowth);
+
+            // Add branches based on combined growth
+            if (crystalGrowth > 0.1 && Math.random() > 0.9) {
+                addBranch();
+            }
+
+            // Animate camera based on combined progress
+            camera.position.z = 5 - Math.max(introProgress * 1.0, scrollFraction * 2);
+            camera.position.y = scrollFraction * 1; // Y position only changes on scroll
+            camera.lookAt(scene.position);
+            
+            // --- Update objects in scene ---
+            crystalGroup.rotation.y += 0.001;
+            crystalGroup.rotation.x += 0.0005;
+            coreCrystal.scale.set(1 + crystalGrowth * 0.5, 1 + crystalGrowth * 0.5, 1 + crystalGrowth * 0.5);
+            
+            branches.forEach((b, index) => {
+                if (b.life < b.maxLife) {
+                    b.life += 0.01;
+                    const scale = Math.sin(b.life / b.maxLife * Math.PI * 0.5);
+                    b.mesh.scale.set(scale, scale, scale);
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        function handleScroll() {
+            const scrollableHeight = document.body.scrollHeight - window.innerHeight;
+            scrollFraction = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+        }
+
+        // --- UI INTERACTIONS ---
+        // Menu Toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navOverlay = document.querySelector('.nav-overlay');
+        menuToggle.addEventListener('click', () => {
+            document.body.classList.toggle('nav-is-open');
+            menuToggle.classList.toggle('is-active');
+            navOverlay.classList.toggle('is-active');
+        });
+
+        // Blog Modal System
+        const blogCards = document.querySelectorAll('.blog-card');
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.modal__close');
+        
+        blogCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const modalId = card.getAttribute('data-modal');
+                document.getElementById(modalId).classList.add('is-active');
+                document.body.classList.add('modal-is-open');
+            });
+        });
+        
+        function closeModal(modal) {
+            modal.classList.remove('is-active');
+            document.body.classList.remove('modal-is-open');
+        }
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                closeModal(button.closest('.modal'));
+            });
+        });
+        
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                   closeModal(modal);
+                }
+            });
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                const activeModal = document.querySelector('.modal.is-active');
+                if (activeModal) closeModal(activeModal);
+            }
+        });
+
+        // Admin Panel Tabs
+        const adminTabs = document.querySelectorAll('.admin-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        adminTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                adminTabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelector(`.tab-content[data-tab="${tab.getAttribute('data-tab')}"]`).classList.add('active');
+            });
+        });
+        
+        document.getElementById('admin-toggle').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('admin-panel').classList.toggle('active');
+        });
+
+        // Text animation function
+        function animateTextElements() {
+            const textElements = document.querySelectorAll('.hero h1, .hero p, .blog-card h3, .blog-card p');
+            
+            textElements.forEach(element => {
+                const text = element.textContent;
+                element.innerHTML = '';
+                
+                // Split text into words and then letters
+                const words = text.split(' ');
+                
+                words.forEach((word, wordIndex) => {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.style.display = 'inline-block';
+                    wordSpan.style.marginRight = '0.3em';
+                    
+                    word.split('').forEach((char, charIndex) => {
+                        const span = document.createElement('span');
+                        span.textContent = char === ' ' ? '&nbsp;' : char;
+                        // Random delay between 0 and 1s for each character
+                        span.style.animationDelay = `${Math.random()}s`;
+                        wordSpan.appendChild(span);
+                    });
+                    
+                    element.appendChild(wordSpan);
+                    
+                    // Add space after word except the last one
+                    if (wordIndex < words.length - 1) {
+                        element.appendChild(document.createTextNode(' '));
+                    }
+                });
+            });
+        }
+
+        // Enhanced Intersection Observer for Sections
+        const sections = document.querySelectorAll("main > section");
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    entry.target.style.opacity = '1';
+                    
+                    // Force reflow to restart animations
+                    const elements = entry.target.querySelectorAll('.hero h1, .hero p, .hero .cta-button, #blog > h2, .blog-grid, .blog-card');
+                    elements.forEach(el => {
+                        if (el.style.animation) {
+                            el.style.animation = 'none';
+                            void el.offsetWidth; // Trigger reflow
+                            el.style.animation = '';
+                        }
+                    });
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { 
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+        
+        sections.forEach(section => {
+            section.style.opacity = '0';
+            observer.observe(section);
+        });
+
+        // Window Events
+        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("resize", () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Start Animation
+        animate();
+    </script>
+</body>
+</html>
