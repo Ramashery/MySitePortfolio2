@@ -1,0 +1,34 @@
+<!-- НАЧАЛО ФАЙЛА 404.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Digital Craft Redirector</title>
+  <script>
+    // Этот скрипт является частью решения для Single Page Application на GitHub Pages.
+    // Он перехватывает запросы к несуществующим страницам (например, при обновлении)
+    // и перенаправляет их на главную страницу, сохраняя исходный путь.
+
+    // 1. Собираем полный путь, который пользователь хотел посетить.
+    var segment = location.pathname.substring(1).split('/')[1] || '';
+    var path = location.pathname.replace(new RegExp('^/' + segment), '');
+    var search = location.search;
+    var hash = location.hash;
+
+    // 2. Сохраняем этот "правильный" путь в sessionStorage.
+    // Ваш основной скрипт в index.html уже умеет его читать.
+    sessionStorage.redirect = path + search + hash;
+
+    // 3. Немедленно перенаправляем на корень сайта (включая имя репозитория, если оно есть).
+    location.replace('/' + segment);
+
+  </script>
+</head>
+<body>
+  <!-- Эта страница видна только долю секунды, поэтому контент не важен. -->
+  <p>If you are not redirected automatically, please <a href="/">click here</a>.</p>
+</body>
+</html>
+
+<!-- КОНЕЦ ФАЙЛА 404.html -->
