@@ -1,0 +1,96 @@
+<!-- НАЧАЛО ФАЙЛА index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO-заглушки для поисковиков -->
+    <title>Web Development &amp; SEO Services in Tbilisi, Georgia | Digital Craft</title>
+    <meta name="description" content="Loading professional web development and SEO services based in Tbilisi. We build high-performance websites for businesses.">
+    
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+    <!-- Скрипт для корректной работы на GitHub Pages -->
+    <script>
+      (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.pathname) {
+          history.replaceState(null, null, (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + redirect);
+        }
+      })();
+    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (оставляем здесь, так как они нужны до основного скрипта) -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <!-- ПОДКЛЮЧАЕМ НАШ НОВЫЙ CSS-ФАЙЛ -->
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+    <noscript>
+        <div><img src="https://mc.yandex.ru/watch/103413242" style="position:absolute; left:-9999px;" alt=""></div>
+        <h1>Digital Craft - Web Development &amp; SEO in Tbilisi</h1>
+        <p>We create professional, high-performance websites and provide SEO services for small and medium businesses in Tbilisi, Georgia. Contact us for a consultation.</p>
+        <a href="/en/services/web-development">Web Development</a>
+        <a href="/en/portfolio/example-project">Our Portfolio</a>
+    </noscript>
+
+    <div id="loader"><div class="spinner"></div></div>
+
+    <iframe id="custom-background-iframe" title="Custom Background"></iframe>
+
+    <button class="menu-toggle" aria-label="Toggle menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+
+    <div class="nav-overlay">
+        <ul class="nav-menu"></ul>
+    </div>
+
+    <main></main>
+    
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <div id="admin-panel">
+        <div class="admin-container">
+            <div class="admin-sidebar">
+                <h3>Admin Panel</h3>
+                <ul class="admin-tabs">
+                    <li class="admin-tab active" data-tab="home">Home Page</li>
+                    <li class="admin-tab" data-tab="services">Services</li>
+                    <li class="admin-tab" data-tab="portfolio">Portfolio</li>
+                    <li class="admin-tab" data-tab="blog">Blog</li>
+                    <li class="admin-tab" data-tab="contact">Contact</li>
+                </ul>
+            </div>
+            <div class="admin-content">
+                <button id="admin-close-btn" title="Close Admin Panel">×</button>
+                <div class="tab-content active" data-tab-content="home"></div>
+                <div class="tab-content" data-tab-content="services"></div>
+                <div class="tab-content" data-tab-content="portfolio"></div>
+                <div class="tab-content" data-tab-content="blog"></div>
+                <div class="tab-content" data-tab-content="contact"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ПОДКЛЮЧАЕМ НАШ НОВЫЙ JAVASCRIPT-ФАЙЛ -->
+    <script type="module" src="./main.js"></script>
+    
+    <script src="metrika.js" defer=""></script>
+
+</body>
+</html>
+
+<!-- КОНЕЦ ФАЙЛА index.html -->
