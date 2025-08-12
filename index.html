@@ -1,0 +1,77 @@
+<!-- НАЧАЛО ОКОНЧАТЕЛЬНОЙ ВЕРСИИ index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development &amp; SEO Services in Tbilisi, Georgia | Digital Craft</title>
+    <meta name="description" content="Loading professional web development and SEO services based in Tbilisi. We build high-performance websites for businesses.">
+
+    <!-- ================== РЕШЕНИЕ ПРОБЛЕМЫ №1: ПУТИ К ФАЙЛАМ ================== -->
+    <!-- Этот тег говорит браузеру: "Всегда ищи файлы (style.css, favicon.svg) от корня репозитория". -->
+    <!-- Это стандартное и единственно верное решение для SPA на GitHub Pages. -->
+    <script>
+      const repoName = window.location.pathname.split('/')[1] || '';
+      if (repoName) {
+        document.write('<base href="/' + repoName + '/">');
+      }
+    </script>
+    
+    <!-- Подключаем стили и иконку. Теперь они всегда будут найдены. -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    
+    <!-- Подключаем шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ================== РЕШЕНИЕ ПРОБЛЕМЫ №2: ПОРЯДОК ЗАГРУЗКИ ================== -->
+    <!-- Загружаем скрипты Firebase ЗДЕСЬ, в <head>. Они 100% загрузятся ДО вашего main.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <!-- Скрипт-восстановитель URL (остается на своем месте) -->
+    <script>
+      (function(){
+        const redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+</head>
+<body>
+    <!-- Вся HTML-структура вашего сайта остается здесь, как и была -->
+    <noscript>
+        <div><img src="https://mc.yandex.ru/watch/103413242" style="position:absolute; left:-9999px;" alt=""></div>
+        <h1>Digital Craft - Web Development &amp; SEO in Tbilisi</h1>
+        <p>We create professional, high-performance websites and provide SEO services...</p>
+        <a href="en/services/web-development">Web Development</a>
+        <a href="en/portfolio/example-project">Our Portfolio</a>
+    </noscript>
+
+    <div id="loader"><div class="spinner"></div></div>
+    <iframe id="custom-background-iframe" title="Custom Background"></iframe>
+    <button class="menu-toggle" aria-label="Toggle menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    <div class="nav-overlay"><ul class="nav-menu"></ul></div>
+    <main></main>
+    <footer class="site-footer" id="site-footer"></footer>
+    <div id="admin-panel">
+        <div class="admin-container">
+            <div class="admin-sidebar"><h3>Admin Panel</h3><ul class="admin-tabs"><li class="admin-tab active" data-tab="home">Home Page</li><li class="admin-tab" data-tab="services">Services</li><li class="admin-tab" data-tab="portfolio">Portfolio</li><li class="admin-tab" data-tab="blog">Blog</li><li class="admin-tab" data-tab="contact">Contact</li></ul></div>
+            <div class="admin-content"><button id="admin-close-btn" title="Close Admin Panel">×</button><div class="tab-content active" data-tab-content="home"></div><div class="tab-content" data-tab-content="services"></div><div class="tab-content" data-tab-content="portfolio"></div><div class="tab-content" data-tab-content="blog"></div><div class="tab-content" data-tab-content="contact"></div></div>
+        </div>
+    </div>
+    
+    <!-- Загружаем ваш главный скрипт и Метрику в САМОМ КОНЦЕ. Они выполнятся, когда все, что выше, уже готово. -->
+    <script type="module" src="main.js"></script>
+    <script src="metrika.js" defer></script>
+
+</body>
+</html>
+
+<!-- КОНЕЦ ОКОНЧАТЕЛЬНОЙ ВЕРСИИ index.html -->
