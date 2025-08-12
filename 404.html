@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Digital Craft - Page Not Found</title>
+  <script>
+    // Получаем путь, на который пытался зайти пользователь
+    var path = location.pathname;
+
+    // Определяем базовый путь репозитория на GitHub Pages (например, '/my-repo-name')
+    // Если сайт в корне (custom domain), basePath будет пустой строкой.
+    var basePath = '/' + (location.pathname.split('/')[1] || '');
+    if (basePath === '/404.html') {
+        basePath = ''; // Случай, когда мы напрямую открыли 404.html в корне
+    }
+
+    // Убираем из пути имя репозитория, чтобы получить чистый путь для нашего SPA
+    var appPath = path.replace(basePath, '');
+
+    // Сохраняем чистый путь в sessionStorage.
+    // Это временное хранилище, которое "переживет" одно перенаправление.
+    sessionStorage.redirect = appPath;
+
+    // Перенаправляем пользователя на главную страницу (indexKey24.html)
+    // Она подхватит сохраненный путь и отобразит нужную страницу.
+    location.href = basePath + '/'; // или basePath + '/indexKey24.html'
+  </script>
+</head>
+<body>
+</body>
+</html>

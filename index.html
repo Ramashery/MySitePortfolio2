@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- --- НОВЫЙ БЛОК: SEO-ЗАГЛУШКИ --- -->
+    <!-- Эти теги видны сразу, до выполнения JS. Они будут заменены на динамические. -->
+    <title>Web Development &amp; SEO Services in Tbilisi, Georgia | Digital Craft</title>
+    <meta name="description" content="Loading professional web development and SEO services based in Tbilisi. We build high-performance websites for businesses.">
+    
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+    <!-- === ИЗМЕНЕНИЕ: СКРИПТ-ОБРАБОТЧИК ДЛЯ 404.HTML НА GITHUB PAGES === -->
+    <!-- Этот скрипт должен идти ДО основного app.js. Он исправляет URL после перенаправления с 404.html -->
+    <script>
+      (function(){
+        // Получаем путь, сохраненный файлом 404.html
+        var redirect = sessionStorage.redirect;
+        // Удаляем его, чтобы он не сработал снова
+        delete sessionStorage.redirect;
+        // Если путь существует, "бесшовно" меняем URL в адресной строке
+        if (redirect && redirect != location.pathname) {
+          history.replaceState(null, null, (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + redirect);
+        }
+      })();
+    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <!-- 1. КРИТИЧЕСКИЙ CSS: Загружается мгновенно для отображения фона и лоадера. -->
+    <style>
+      :root { --color-bg: #030409; --color-accent: #b8d8e8; }
+      body { margin: 0; background-color: var(--color-bg); }
+      #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--color-bg); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s ease-out; }
+      #loader.hidden { opacity: 0; pointer-events: none; }
+      .spinner { width: 50px; height: 50px; border: 3px solid var(--color-accent); border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+
+    <!-- 2. ОСНОВНОЙ CSS: Загружается асинхронно, не блокируя отрисовку страницы. -->
+    <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="styles.css"></noscript>
+
+</head>
+<body>
+    <noscript>
+        <!-- Этот блок виден только если JS отключен. Помогает самым простым роботам. -->
+        <div><img src="https://mc.yandex.ru/watch/103413242" style="position:absolute; left:-9999px;" alt=""></div>
+        <h1>Digital Craft - Web Development &amp; SEO in Tbilisi</h1>
+        <p>We create professional, high-performance websites and provide SEO services for small and medium businesses in Tbilisi, Georgia. Contact us for a consultation.</p>
+        <a href="/en/services/web-development">Web Development</a>
+        <a href="/en/portfolio/example-project">Our Portfolio</a>
+    </noscript>
+
+    <div id="loader"><div class="spinner"></div></div>
+
+    <iframe id="custom-background-iframe" title="Custom Background"></iframe>
+
+    <button class="menu-toggle" aria-label="Toggle menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+
+    <div class="nav-overlay">
+        <ul class="nav-menu"></ul>
+    </div>
+
+    <main></main>
+    
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <div id="admin-panel">
+        <div class="admin-container">
+            <div class="admin-sidebar">
+                <h3>Admin Panel</h3>
+                <ul class="admin-tabs">
+                    <li class="admin-tab active" data-tab="home">Home Page</li>
+                    <li class="admin-tab" data-tab="services">Services</li>
+                    <li class="admin-tab" data-tab="portfolio">Portfolio</li>
+                    <li class="admin-tab" data-tab="blog">Blog</li>
+                    <li class="admin-tab" data-tab="contact">Contact</li>
+                </ul>
+            </div>
+            <div class="admin-content">
+                <button id="admin-close-btn" title="Close Admin Panel">×</button>
+                <div class="tab-content active" data-tab-content="home"></div>
+                <div class="tab-content" data-tab-content="services"></div>
+                <div class="tab-content" data-tab-content="portfolio"></div>
+                <div class="tab-content" data-tab-content="blog"></div>
+                <div class="tab-content" data-tab-content="contact"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JAVASCRIPT ВЫНЕСЕН В ОТДЕЛЬНЫЙ ФАЙЛ С АТРИБУТОМ DEFER -->
+    <script type="module" src="app.js" defer></script>
+    
+    <script src="metrika.js" defer=""></script>
+
+</body></html>
