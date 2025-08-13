@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Digital Craft</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Стили админки -->
+    <link rel="stylesheet" href="/admin.css">
+
+    <!-- Firebase SDK (полный набор для админки) -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+    <div id="admin-panel">
+        <!-- Экран входа, виден по умолчанию -->
+        <div id="login-screen">
+            <div class="login-box">
+                <h2>Admin Login</h2>
+                <form id="login-form">
+                    <input type="email" id="login-email" placeholder="Email" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <button type="submit">Sign In</button>
+                    <p id="login-error"></p>
+                </form>
+                 <a href="/" style="display: block; margin-top: 20px; font-size: 0.9em; opacity: 0.7;">Go to main site</a>
+            </div>
+        </div>
+
+        <!-- Контейнер для админ-панели, будет заполнен JS после входа -->
+        <div class="admin-container" style="display: none;">
+            <div class="admin-sidebar">
+                <h3>Admin Panel</h3>
+                <ul class="admin-tabs">
+                    <!-- Заполняется JS -->
+                </ul>
+                <button id="logout-btn">Logout</button>
+            </div>
+            <div class="admin-content">
+                <a href="/" id="admin-close-btn" title="Go to Main Site">×</a>
+                <!-- Заполняется JS -->
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="/admin.js"></script>
+
+</body>
+</html>
