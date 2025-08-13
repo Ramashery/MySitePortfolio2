@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Web Development &amp; SEO Services in Tbilisi, Georgia | Digital Craft</title>
+    <meta name="description" content="Loading professional web development and SEO services based in Tbilisi. We build high-performance websites for businesses.">
+    
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <style>
+        :root { --color-bg: #030409; --color-text: #FFFFFF; --color-accent: #b8d8e8; }
+        body { margin: 0; padding: 0; background-color: var(--color-bg); color: var(--color-text); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--color-bg); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s ease-out; }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .spinner { width: 50px; height: 50px; border: 3px solid var(--color-accent); border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+
+    <link rel="stylesheet" href="/styles.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/styles.css"></noscript>
+</head>
+<body>
+    <noscript>
+        <div><img src="https://mc.yandex.ru/watch/103413242" style="position:absolute; left:-9999px;" alt=""></div>
+        <h1>Digital Craft - Web Development &amp; SEO in Tbilisi</h1>
+        <p>We create professional, high-performance websites and provide SEO services for small and medium businesses in Tbilisi, Georgia. Contact us for a consultation.</p>
+        <a href="/en/services/web-development">Web Development</a>
+        <a href="/en/portfolio/example-project">Our Portfolio</a>
+    </noscript>
+
+    <div id="loader"><div class="spinner"></div></div>
+    <iframe id="custom-background-iframe" title="Custom Background"></iframe>
+    <button class="menu-toggle" aria-label="Toggle menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    <div class="nav-overlay"><ul class="nav-menu"></ul></div>
+    <main></main>
+    <footer class="site-footer" id="site-footer"></footer>
+    <div id="admin-panel"><!-- Admin panel structure remains the same --></div>
+    
+    <script type="module">
+        // --- FIREBASE & INITIALIZATION ---
+        const firebaseConfig = { apiKey: "AIzaSyAT4dDEIDUtzP60ibjahO06P75Q6h95ZN4", authDomain: "razrabotka-b61bc.firebaseapp.com", projectId: "razrabotka-b61bc", storageBucket: "razrabotka-b61bc.firebasestorage.app", messagingSenderId: "394402564794", appId: "1:394402564794:web:f610ffb03e655c600c5083" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        let siteData = {}; // Cache for home page data
+
+        // --- CORE DATA FUNCTIONS ---
+        const processDocData = (data) => {
+            if (data && typeof data.schemaJsonLd === 'string' && data.schemaJsonLd.trim().startsWith('{')) {
+                try { data.schemaJsonLd = JSON.parse(data.schemaJsonLd); } 
+                catch (e) { console.error('Failed to parse schemaJsonLd string:', e); data.schemaJsonLd = {}; }
+            }
+            return data;
+        };
+
+        async function loadAllData() {
+            try {
+                const collections = ['services', 'portfolio', 'blog', 'contact'];
+                const dataPromises = [db.collection('home').doc('content').get(), ...collections.map(col => db.collection(col).get())];
+                const [homeDoc, ...snapshots] = await Promise.all(dataPromises);
+                const freshSiteData = {};
+                freshSiteData.home = homeDoc.exists ? processDocData(homeDoc.data()) : {};
+                collections.forEach((col, index) => {
+                    freshSiteData[col] = snapshots[index].docs.map(doc => ({ id: doc.id, ...processDocData(doc.data()) }));
+                });
+                siteData = freshSiteData; // Cache the data
+                return freshSiteData;
+            } catch (error) { console.error("Error loading all data:", error); return null; }
+        }
+
+        async function loadItemData(collection, slug, lang) {
+            try {
+                const snapshot = await db.collection(collection).where("lang", "==", lang).where("urlSlug", "==", slug).limit(1).get();
+                if (snapshot.empty) { return null; }
+                const doc = snapshot.docs[0];
+                return { id: doc.id, ...processDocData(doc.data()) };
+            } catch (error) { console.error("Error loading single item:", error); return null; }
+        }
+
+        // --- RENDER FUNCTIONS (Unchanged, provided for completeness) ---
+        function renderSeoTags(data) { document.querySelectorAll('meta[name="description"], meta[property^="og:"], script[type="application/ld+json"], link[rel="canonical"]').forEach(el => el.remove()); document.title = data.seoTitle || "Digital Craft"; document.documentElement.lang = data.lang || 'en'; const createMeta = (attr, key, value) => { if (value) { const meta = document.createElement('meta'); meta.setAttribute(attr, key); meta.content = value; document.head.appendChild(meta); } }; createMeta('name', 'description', data.metaDescription); createMeta('property', 'og:title', data.ogTitle || data.seoTitle); createMeta('property', 'og:description', data.ogDescription || data.metaDescription); const ogImage = data.ogImage || data.media?.find(url => !/youtube|vimeo/.test(url)) || ''; if (ogImage) createMeta('property', 'og:image', ogImage); const canonical = document.createElement('link'); canonical.rel = 'canonical'; const canonicalBaseUrl = 'https://digital-craft-tbilisi.netlify.app'; let cleanPath = window.location.pathname; if (cleanPath.length > 1 && cleanPath.endsWith('/')) { cleanPath = cleanPath.slice(0, -1); } canonical.href = canonicalBaseUrl + cleanPath; document.head.appendChild(canonical); if (data.schemaJsonLd && typeof data.schemaJsonLd === 'object' && Object.keys(data.schemaJsonLd).length > 0) { const script = document.createElement('script'); script.type = 'application/ld+json'; script.textContent = JSON.stringify(data.schemaJsonLd); document.head.appendChild(script); } }
+        function formatContentHtml(content) { if (!content) return ''; let processedContent = content.replace(/\r\n/g, '\n'); const blocks = processedContent.split(/\n{2,}/); const html = blocks.map(block => { const trimmedBlock = block.trim(); if (!trimmedBlock) return ''; const youtubeRegex = /^https?:\/\/(?:www\.|m\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch?v=|watch\?.*&v=|shorts\/))([a-zA-Z0-9_-]{11}).*$/; const imageRegex = /^https?:\/\/[^<>"']+\.(?:jpg|jpeg|png|gif|webp|svg)\s*$/i; const youtubeMatch = trimmedBlock.match(youtubeRegex); const imageMatch = trimmedBlock.match(imageRegex); if (/^<(p|div|h[1-6]|ul|ol|li|blockquote|hr|table|pre)/i.test(trimmedBlock)) { return trimmedBlock; } else if (youtubeMatch && youtubeMatch[1]) { const videoId = youtubeMatch[1]; return `<div class="embedded-video" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin: 1.5em 0; border-radius: 4px; border: 1px solid var(--color-border);"><iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`; } else if (imageMatch) { return `<p style="margin: 1.5em 0;"><img src="${trimmedBlock}" alt="Embedded content" style="max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 4px; border: 1px solid var(--color-border);" /></p>`; } else { return `<p>${trimmedBlock.replace(/\n/g, '<br>')}</p>`; } }).join(''); return html; }
+        const mainContentEl = document.querySelector('main');
+        const defaultLang = 'en';
+        let paragraphObserver, floatingObserver, homePageObserver;
+        function renderHomePage() { mainContentEl.innerHTML = `<section id="hero" class="hero"></section><section id="services"></section><section id="portfolio"></section><section id="blog"></section><section id="contact"></section>`; document.getElementById('admin-panel').style.display = ''; document.getElementById('site-footer').style.display = 'block'; applyCustomBackground(); renderSeoTags(siteData.home); renderHero(); renderSection('services', 'Our Services', siteData.services); renderSection('portfolio', 'Our Work', siteData.portfolio); renderSection('blog', 'Latest Insights', siteData.blog); renderSection('contact', 'Get in Touch', siteData.contact); initMobileSliders(); initFloatingObservers(); initHomePageObservers(); }
+        function renderDetailPage(item) { mainContentEl.innerHTML = ''; document.getElementById('site-footer').style.display = 'none'; if (!item) { mainContentEl.innerHTML = `<section class="detail-page-header"><h1>404 - Not Found</h1><p>The page you were looking for does not exist.</p><a href="/">Go back home</a></section>`; document.title = "404 Not Found | Digital Craft"; applyCustomBackground(); return; } document.getElementById('admin-panel').style.display = 'none'; document.documentElement.lang = item.lang; applyCustomBackground(item); renderSeoTags(item); const formattedContent = formatContentHtml(item.mainContent); mainContentEl.innerHTML = `<section><div class="detail-page-header"><h1 class="fade-in-up" style="animation-delay: 0.5s;">${item.h1 || ''}</h1>${item.price ? `<div class="detail-price fade-in-up" style="animation-delay: 0.7s;">${item.price}</div>` : ''}</div><div class="detail-content">${formattedContent}</div></section>`; initParagraphObservers(); }
+        function renderMenu() { const menuEl = document.querySelector('.nav-menu'); if (!menuEl) return; const menuItems = [ { label: 'Home', href: '/#hero' }, { label: 'Services', href: '/#services' }, { label: 'Portfolio', href: '/#portfolio' }, { label: 'Blog', href: '/#blog' }, { label: 'Contact', href: '/#contact' } ]; menuEl.innerHTML = menuItems.map(item => `<li><a href="${item.href}">${item.label}</a></li>`).join(''); }
+        function renderHero() { const heroSection = document.getElementById('hero'); if (!heroSection || !siteData.home) return; const { h1, subtitle } = siteData.home; let heroContent = `<h1>${h1 || ''}</h1>`; if (subtitle) { const formattedSubtitle = formatContentHtml(subtitle); heroContent += `<div class="hero-subtitle-container">${formattedSubtitle}</div>`; } heroSection.innerHTML = heroContent; };
+        function renderSection(key, title, items) { const section = document.getElementById(key); if (!section) return; const itemsFromDb = items || siteData[key] || []; const desktopItemsHTML = itemsFromDb.map(item => { const langPrefix = item.lang ? `/${item.lang}` : ''; const itemUrl = `${langPrefix}/${key}/${item.urlSlug}`; return `<a href="${itemUrl}" class="item-card floating-item"><div class="item-card__image" style="background-image: url('${(item.media || []).find(url => !/youtube|vimeo/.test(url)) || ''}')"></div><div class="item-card__content"><h3>${item.title}</h3><div class="card-subtitle">${item.subtitle}</div><p>${item.description}</p></div></a>` }).join(''); const desktopGrid = `<div class="item-grid">${desktopItemsHTML}</div>`; const langOrder = ['en', 'ka', 'ua', 'ru']; const itemsByLang = {}; itemsFromDb.forEach(item => { if (!itemsByLang[item.lang]) itemsByLang[item.lang] = []; itemsByLang[item.lang].push(item); }); const mobileSlidersHTML = langOrder.map(lang => { const langItems = itemsByLang[lang]; if (!langItems || langItems.length === 0) return ''; const slidesHTML = langItems.map((item, index) => { const langPrefix = item.lang ? `/${item.lang}` : ''; const itemUrl = `${langPrefix}/${key}/${item.urlSlug}`; return `<a href="${itemUrl}" class="item-card ${index === 0 ? 'active' : ''}"><div class="item-card__image" style="background-image: url('${(item.media || []).find(url => !/youtube|vimeo/.test(url)) || ''}')"></div><div class="item-card__content"><h3>${item.title}</h3><div class="card-subtitle">${item.subtitle}</div><p>${item.description}</p></div></a>` }).join(''); const dotsHTML = langItems.length > 1 ? langItems.map((_, index) => `<span class="slider-dot ${index === 0 ? 'active' : ''}" data-index="${index}"></span>`).join('') : ''; return `<div class="language-slider-block"><div class="cross-fade-slider">${slidesHTML}</div><div class="slider-nav">${dotsHTML}</div></div>`; }).join(''); const mobileContainer = `<div class="mobile-sliders-container">${mobileSlidersHTML}</div>`; section.innerHTML = `<div class="animated-container"><h2>${title}</h2></div>${desktopGrid}${mobileContainer}`; };
+        // Admin panel, observers, and other helpers would go here, unchanged.
+        // For brevity, I'm omitting them, but they should remain in your file.
+        // The most important part is the initApp function below.
+        function initParagraphObservers() { /* ... */ }
+        function initFloatingObservers() { /* ... */ }
+        function initHomePageObservers() { /* ... */ }
+        function initStaticEventListeners() { /* ... */ } // Assume all these helper functions are here
+        function handleNavigation(e) { /* ... */ }
+        function applyCustomBackground(item = null) { /* ... */ }
+        // Admin functions also remain unchanged
+        // ...
+
+        // --- ГЛАВНАЯ ФУНКЦИЯ ЗАПУСКА ПРИЛОЖЕНИЯ (ПОЛНОСТЬЮ ПЕРЕПИСАНА) ---
+        async function main() {
+            initStaticEventListeners(); // Устанавливаем обработчики кликов и навигации
+            renderMenu(); // Меню можно нарисовать сразу, оно не зависит от данных
+
+            const path = window.location.pathname;
+            const detailPageRegex = /^\/(?:([a-z]{2})\/)?(services|portfolio|blog|contact)\/([a-zA-Z0-9-]+)\/?$/;
+            const match = path.match(detailPageRegex);
+
+            if (match) {
+                // --- СЦЕНАРИЙ ДЛЯ ВНУТРЕННЕЙ СТРАНИЦЫ (БЫСТРЫЙ) ---
+                const [, lang, collection, slug] = match;
+                const currentLang = lang || defaultLang;
+
+                // 1. Загружаем ТОЛЬКО данные для этой страницы
+                const item = await loadItemData(collection, slug, currentLang);
+                
+                // 2. Немедленно рисуем страницу
+                renderDetailPage(item);
+                document.getElementById('loader').classList.add('hidden');
+
+                // 3. В фоновом режиме подгружаем все остальное для админ-панели (если она понадобится)
+                if (Object.keys(siteData).length === 0) { // Только если еще не загружали
+                    await loadAllData();
+                    // renderAdminPanel(); // Раскомментируйте, если админка нужна
+                }
+
+            } else {
+                // --- СЦЕНАРИЙ ДЛЯ ГЛАВНОЙ СТРАНИЦЫ (СТАНДАРТНЫЙ) ---
+                
+                // 1. Загружаем все данные
+                await loadAllData();
+                
+                // 2. Рисуем главную страницу
+                renderHomePage();
+                // renderAdminPanel(); // Раскомментируйте, если админка нужна
+                document.getElementById('loader').classList.add('hidden');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', main);
+
+    </script>
+    <script src="metrika.js" defer=""></script>
+</body>
+</html>
