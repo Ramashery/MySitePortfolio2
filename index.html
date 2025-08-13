@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development & SEO Services in Tbilisi, Georgia | Digital Craft</title>
+    <meta name="description" content="Loading professional web development and SEO services based in Tbilisi. We build high-performance websites for businesses.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (только для чтения данных) -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+    <!-- Стили -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Критические стили для загрузчика -->
+    <style>
+        :root { --color-bg: #030409; --color-accent: #b8d8e8; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--color-bg); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s ease-out; }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .spinner { width: 50px; height: 50px; border: 3px solid var(--color-accent); border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <noscript>
+        <h1>Digital Craft - Web Development & SEO in Tbilisi</h1>
+        <p>We create professional, high-performance websites and provide SEO services for small and medium businesses in Tbilisi, Georgia. Contact us for a consultation.</p>
+    </noscript>
+
+    <div id="loader"><div class="spinner"></div></div>
+    <iframe id="custom-background-iframe" title="Custom Background"></iframe>
+    <button class="menu-toggle" aria-label="Toggle menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-overlay">
+        <ul class="nav-menu"></ul>
+    </div>
+    <main></main>
+    <footer class="site-footer" id="site-footer"></footer>
+    
+    <script type="module">
+        // --- КОНФИГУРАЦИЯ FIREBASE ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAT4dDEIDUtzP60ibjahO06P75Q6h95ZN4",
+          authDomain: "razrabotka-b61bc.firebaseapp.com",
+          projectId: "razrabotka-b61bc",
+          storageBucket: "razrabotka-b61bc.firebasestorage.app",
+          messagingSenderId: "394402564794",
+          appId: "1:394402564794:web:f610ffb03e655c600c5083"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+        let siteData = {};
+        const mainContentEl = document.querySelector('main');
+        const defaultLang = 'en';
+        let paragraphObserver, floatingObserver, homePageObserver;
+
+        const initialSiteData = {
+            home: { h1: "Loading...", subtitle: "Please wait while we fetch the latest data.", lang: "en", seoTitle: "Digital Craft", metaDescription: "Professional websites for small businesses", schemaJsonLd: {}, ogTitle: "", ogDescription: "", ogImage: "", backgroundHtml: "" },
+            services: [], portfolio: [], blog: [], contact: []
+        };
+        
+        // --- ФУНКЦИИ ЗАГРУЗКИ И ОТОБРАЖЕНИЯ ---
+        async function loadData() {
+            const freshSiteData = {};
+            try {
+                const collections = ['services', 'portfolio', 'blog', 'contact'];
+                const dataPromises = [
+                    db.collection('home').doc('content').get(),
+                    ...collections.map(col => db.collection(col).get())
+                ];
+                const [homeDoc, ...snapshots] = await Promise.all(dataPromises);
+                
+                const processDocData = (data) => {
+                    if (data && typeof data.schemaJsonLd === 'string' && data.schemaJsonLd.trim().startsWith('{')) {
+                        try {
+                            data.schemaJsonLd = JSON.parse(data.schemaJsonLd);
+                        } catch (e) {
+                            console.error('Failed to parse schemaJsonLd string:', e);
+                            data.schemaJsonLd = {};
+                        }
+                    }
+                    return data;
+                };
+
+                freshSiteData.home = homeDoc.exists ? processDocData(homeDoc.data()) : {};
+                collections.forEach((col, index) => {
+                    freshSiteData[col] = snapshots[index].docs.map(doc => ({ id: doc.id, ...processDocData(doc.data()) }));
+                });
+                return freshSiteData;
+            } catch (error) {
+                console.error("Error loading data from Firebase:", error);
+                return JSON.parse(JSON.stringify(initialSiteData));
+            }
+        }
+
+        function renderSeoTags(data) {
+            document.querySelectorAll('meta[name="description"], meta[property^="og:"], script[type="application/ld+json"], link[rel="canonical"]').forEach(el => el.remove());
+            document.title = data.seoTitle || "Digital Craft";
+            document.documentElement.lang = data.lang || 'en';
+            const createMeta = (attr, key, value) => { if (value) { const meta = document.createElement('meta'); meta.setAttribute(attr, key); meta.content = value; document.head.appendChild(meta); } };
+            createMeta('name', 'description', data.metaDescription);
+            createMeta('property', 'og:title', data.ogTitle || data.seoTitle);
+            createMeta('property', 'og:description', data.ogDescription || data.metaDescription);
+            const ogImage = data.ogImage || (data.media && data.media.length > 0 ? data.media[0] : '');
+            if (ogImage) createMeta('property', 'og:image', ogImage);
+            const canonical = document.createElement('link');
+            canonical.rel = 'canonical';
+            const canonicalBaseUrl = 'https://digital-craft-tbilisi.netlify.app'; 
+            let cleanPath = window.location.pathname;
+            if (cleanPath.length > 1 && cleanPath.endsWith('/')) { cleanPath = cleanPath.slice(0, -1); }
+            canonical.href = canonicalBaseUrl + cleanPath;
+            document.head.appendChild(canonical);
+            if (data.schemaJsonLd && typeof data.schemaJsonLd === 'object' && Object.keys(data.schemaJsonLd).length > 0) {
+                const script = document.createElement('script');
+                script.type = 'application/ld+json';
+                script.textContent = JSON.stringify(data.schemaJsonLd);
+                document.head.appendChild(script);
+            }
+        }
+        
+        function formatContentHtml(content) {
+            if (!content) return '';
+            let processedContent = content.replace(/\r\n/g, '\n');
+            const blocks = processedContent.split(/\n{2,}/);
+            const html = blocks.map(block => {
+                const trimmedBlock = block.trim();
+                if (!trimmedBlock) return '';
+                const youtubeRegex = /^https?:\/\/(?:www\.|m\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch?v=|watch\?.*&v=|shorts\/))([a-zA-Z0-9_-]{11}).*$/;
+                const imageRegex = /^https?:\/\/[^<>"']+\.(?:jpg|jpeg|png|gif|webp|svg)\s*$/i;
+                const youtubeMatch = trimmedBlock.match(youtubeRegex);
+                const imageMatch = trimmedBlock.match(imageRegex);
+                if (/^<(p|div|h[1-6]|ul|ol|li|blockquote|hr|table|pre)/i.test(trimmedBlock)) { return trimmedBlock; }
+                else if (youtubeMatch && youtubeMatch[1]) { const videoId = youtubeMatch[1]; return `<div class="embedded-video" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin: 1.5em 0; border-radius: 4px; border: 1px solid var(--color-border);"><iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`; } 
+                else if (imageMatch) { return `<p style="margin: 1.5em 0;"><img src="${trimmedBlock}" alt="Embedded content" style="max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 4px; border: 1px solid var(--color-border);" /></p>`; } 
+                else { return `<p>${trimmedBlock.replace(/\n/g, '<br>')}</p>`; }
+            }).join('');
+            return html;
+        }
+
+        function renderHomePage() {
+            mainContentEl.innerHTML = `<section id="hero" class="hero"></section><section id="services"></section><section id="portfolio"></section><section id="blog"></section><section id="contact"></section>`;
+            renderSeoTags(siteData.home);
+            renderHero();
+            renderSection('services', 'Our Services', siteData.services);
+            renderSection('portfolio', 'Our Work', siteData.portfolio);
+            renderSection('blog', 'Latest Insights', siteData.blog);
+            renderSection('contact', 'Get in Touch', siteData.contact);
+            initMobileSliders();
+            initFloatingObservers();
+            initHomePageObservers();
+            document.getElementById('site-footer').style.display = 'block';
+        }
+
+        function renderDetailPage(collection, slug, lang) {
+            const item = siteData[collection]?.find(d => d.urlSlug === slug && d.lang === lang);
+            if (!item) {
+                mainContentEl.innerHTML = `<section><h1>404 - Not Found</h1><p>The page you were looking for does not exist.</p><a href="/">Go back home</a></section>`;
+                document.title = "404 Not Found | Digital Craft";
+                return;
+            }
+            renderSeoTags(item);
+            const formattedContent = formatContentHtml(item.mainContent);
+            mainContentEl.innerHTML = `<section><div class="detail-page-header"><h1>${item.h1 || ''}</h1>${item.price ? `<div class="detail-price">${item.price}</div>` : ''}</div><div class="detail-content">${formattedContent}</div></section>`;
+            initParagraphObservers();
+            document.getElementById('site-footer').style.display = 'none';
+        }
+        
+        function routeAndRender() {
+            if (paragraphObserver) paragraphObserver.disconnect();
+            if (floatingObserver) floatingObserver.disconnect();
+            if (homePageObserver) homePageObserver.disconnect();
+
+            const path = window.location.pathname;
+            const detailPageRegex = /^\/(?:([a-z]{2})\/)?(services|portfolio|blog|contact)\/([a-zA-Z0-9-]+)\/?$/;
+            const match = path.match(detailPageRegex);
+
+            if (match) {
+                const [, lang, collection, slug] = match;
+                renderDetailPage(collection, slug, lang || defaultLang);
+            } else {
+                renderHomePage();
+            }
+        }
+        
+        function renderMenu() {
+            const menuEl = document.querySelector('.nav-menu');
+            if (!menuEl) return;
+            const menuItems = [ { label: 'Home', href: '/#hero' }, { label: 'Services', href: '/#services' }, { label: 'Portfolio', href: '/#portfolio' }, { label: 'Blog', href: '/#blog' }, { label: 'Contact', href: '/#contact' } ];
+            menuEl.innerHTML = menuItems.map(item => `<li><a href="${item.href}">${item.label}</a></li>`).join('');
+        }
+
+        function renderHero() {
+            const heroSection = document.getElementById('hero');
+            if (!heroSection || !siteData.home) return;
+            const { h1, subtitle } = siteData.home;
+            heroSection.innerHTML = `<h1>${h1 || ''}</h1><div class="hero-subtitle-container">${formatContentHtml(subtitle)}</div>`;
+        }
+
+        function renderSection(key, title, items) {
+            const section = document.getElementById(key);
+            if (!section) return;
+            const itemsFromDb = items || [];
+            const desktopItemsHTML = itemsFromDb.map(item => {
+                const langPrefix = item.lang !== defaultLang ? `/${item.lang}` : '';
+                const itemUrl = `${langPrefix}/${key}/${item.urlSlug}`;
+                return `<a href="${itemUrl}" class="item-card floating-item"><div class="item-card__image" style="background-image: url('${item.media && item.media.length > 0 ? item.media[0] : ''}')"></div><div class="item-card__content"><h3>${item.title}</h3><div class="card-subtitle">${item.subtitle}</div><p>${item.description}</p></div></a>`;
+            }).join('');
+            // ... (здесь должна быть ваша логика для мобильных слайдеров, если она нужна)
+            section.innerHTML = `<h2>${title}</h2><div class="item-grid">${desktopItemsHTML}</div>`;
+        }
+
+        function handleNavigation(e) {
+            const link = e.target.closest('a');
+            if (!link || link.target === '_blank' || link.protocol !== window.location.protocol || link.host !== window.location.host || e.metaKey || e.ctrlKey || e.shiftKey) {
+                return;
+            }
+            const linkUrl = new URL(link.href);
+            if (linkUrl.pathname === window.location.pathname && linkUrl.hash) {
+                 e.preventDefault();
+                 document.querySelector(linkUrl.hash)?.scrollIntoView({ behavior: 'smooth' });
+                 return;
+            }
+            if (linkUrl.href === window.location.href) {
+                e.preventDefault();
+                return;
+            }
+            e.preventDefault();
+            window.history.pushState({}, '', linkUrl.pathname);
+            routeAndRender();
+            window.scrollTo(0, 0);
+        }
+
+        function initMobileSliders() { /* Ваша функция initMobileSliders */ }
+        function createFloatingObserver() { /* Ваша функция createFloatingObserver */ }
+        function initParagraphObservers() { /* Ваша функция initParagraphObservers */ }
+        function initFloatingObservers() { /* Ваша функция initFloatingObservers */ }
+        function initHomePageObservers() { /* Ваша функция initHomePageObservers */ }
+        
+        // --- ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ---
+        function initApp() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navOverlay = document.querySelector('.nav-overlay');
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.body.classList.toggle('nav-is-open');
+                menuToggle.classList.toggle('is-active');
+                navOverlay.classList.toggle('is-active');
+            });
+            navOverlay.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target === navOverlay) {
+                    document.body.classList.remove('nav-is-open');
+                    menuToggle.classList.remove('is-active');
+                    navOverlay.classList.remove('is-active');
+                }
+            });
+            window.addEventListener('popstate', routeAndRender);
+            document.body.addEventListener('click', handleNavigation);
+
+            const footer = document.getElementById('site-footer');
+            footer.innerHTML = `© 2025 Digital Craft. All rights reserved.`;
+            footer.addEventListener('click', () => {
+                window.location.href = 'admin.html';
+            });
+
+            loadData().then((freshData) => {
+                siteData = freshData;
+                renderMenu();
+                routeAndRender();
+                document.getElementById('loader').classList.add('hidden');
+            }).catch(error => {
+                 console.error("Initialization failed:", error);
+                 document.getElementById('loader').innerHTML = "Failed to load content.";
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+    <script src="metrika.js" defer></script>
+</body>
+</html>
