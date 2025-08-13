@@ -1,0 +1,4 @@
+[[headers]]
+  for = "/assets/*" # Укажите путь к вашим JS, CSS, картинкам, шрифтам
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

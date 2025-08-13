@@ -1,0 +1,12 @@
+# Кешируем всё, что не меняется, на 1 год
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Можете добавить другие папки с картинками, шрифтами, js, css
+
+# HTML-файлы кешируем ненадолго или не кешируем
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
