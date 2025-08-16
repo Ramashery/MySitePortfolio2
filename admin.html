@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel | Digital Craft</title>
-    <meta name="robots" content="noindex, nofollow"> <!-- Запрещаем индексацию админки -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet"> <!-- Запрещаем индексацию админки -->
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+    
+    <!-- Дополнительные мета-теги для безопасности -->
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     
@@ -60,6 +68,12 @@
     </div>
     
     <script type="module" src="/admin.js"></script>
+    
+    <!-- Sitemap generator for SEO -->
+    <script src="/sitemap-generator.js"></script>
+    
+    <!-- SEO Enhancer for better meta tags management -->
+    <script src="/seo-enhancer.js"></script>
 
 </body>
 </html>

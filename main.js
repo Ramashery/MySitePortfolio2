@@ -19,28 +19,149 @@ const initialSiteData = {
 
 // --- SEO & DATA FUNCTIONS ---
 function renderSeoTags(data) {
-    document.querySelectorAll('meta[name="description"], meta[property^="og:"], script[type="application/ld+json"], link[rel="canonical"]').forEach(el => el.remove());
+    // Удаляем существующие SEO теги
+    document.querySelectorAll('meta[name="description"], meta[property^="og:"], meta[name="keywords"], meta[name="author"], script[type="application/ld+json"], link[rel="canonical"]').forEach(el => el.remove());
+    
+    // Обновляем title и lang
     document.title = data.seoTitle || "Digital Craft";
     document.documentElement.lang = data.lang || 'en';
-    const createMeta = (attr, key, value) => { if (value) { const meta = document.createElement('meta'); meta.setAttribute(attr, key); meta.content = value; document.head.appendChild(meta); } };
+    
+    // Функция для создания мета-тегов
+    const createMeta = (attr, key, value) => { 
+        if (value) { 
+            const meta = document.createElement('meta'); 
+            meta.setAttribute(attr, key); 
+            meta.content = value; 
+            document.head.appendChild(meta); 
+        } 
+    };
+    
+    // Основные SEO мета-теги
     createMeta('name', 'description', data.metaDescription);
+    createMeta('name', 'keywords', data.keywords || 'web development, SEO services, Tbilisi, Georgia, website design, digital marketing, business websites');
+    createMeta('name', 'author', data.author || 'Digital Craft');
+    
+    // Open Graph мета-теги
     createMeta('property', 'og:title', data.ogTitle || data.seoTitle);
     createMeta('property', 'og:description', data.ogDescription || data.metaDescription);
+    createMeta('property', 'og:type', data.ogType || 'website');
+    createMeta('property', 'og:url', data.ogUrl || window.location.href);
+    createMeta('property', 'og:site_name', data.ogSiteName || 'Digital Craft');
+    createMeta('property', 'og:locale', data.ogLocale || 'en_US');
+    
+    // Open Graph изображение
     const ogImage = data.ogImage || data.media?.find(url => !/youtube|vimeo/.test(url)) || '';
-    if (ogImage) createMeta('property', 'og:image', ogImage);
+    if (ogImage) {
+        createMeta('property', 'og:image', ogImage);
+        createMeta('property', 'og:image:width', '1200');
+        createMeta('property', 'og:image:height', '630');
+        createMeta('property', 'og:image:alt', data.ogImageAlt || data.seoTitle || 'Digital Craft');
+    }
+    
+    // Twitter Card мета-теги
+    createMeta('name', 'twitter:card', 'summary_large_image');
+    createMeta('name', 'twitter:title', data.twitterTitle || data.seoTitle);
+    createMeta('name', 'twitter:description', data.twitterDescription || data.metaDescription);
+    if (ogImage) {
+        createMeta('name', 'twitter:image', ogImage);
+        createMeta('name', 'twitter:image:alt', data.twitterImageAlt || data.seoTitle || 'Digital Craft');
+    }
+    
+    // Canonical URL
     const canonical = document.createElement('link');
     canonical.rel = 'canonical';
     const canonicalBaseUrl = 'https://digital-craft-tbilisi.netlify.app'; 
     let cleanPath = window.location.pathname;
-    if (cleanPath.length > 1 && cleanPath.endsWith('/')) { cleanPath = cleanPath.slice(0, -1); }
+    if (cleanPath.length > 1 && cleanPath.endsWith('/')) { 
+        cleanPath = cleanPath.slice(0, -1); 
+    }
     canonical.href = canonicalBaseUrl + cleanPath;
     document.head.appendChild(canonical);
+    
+    // Структурированные данные (Schema.org)
     if (data.schemaJsonLd && typeof data.schemaJsonLd === 'object' && Object.keys(data.schemaJsonLd).length > 0) {
         const script = document.createElement('script');
         script.type = 'application/ld+json';
         script.textContent = JSON.stringify(data.schemaJsonLd);
         document.head.appendChild(script);
+    } else {
+        // Генерируем базовые структурированные данные для страницы
+        const defaultSchema = generateDefaultSchema(data);
+        if (defaultSchema) {
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(defaultSchema);
+            document.head.appendChild(script);
+        }
     }
+}
+
+// Функция для генерации базовых структурированных данных
+function generateDefaultSchema(data) {
+    const path = window.location.pathname;
+    const detailPageRegex = /^\/(?:([a-z]{2})\/)?(services|portfolio|blog|contact)\/([a-zA-Z0-9-]+)\/?$/;
+    const match = path.match(detailPageRegex);
+    
+    if (match) {
+        // Для детальных страниц
+        const [, lang, collection, slug] = match;
+        const item = siteData[collection]?.find(d => d.urlSlug === slug && d.lang === lang);
+        
+        if (item) {
+            if (collection === 'services') {
+                return {
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": item.title || item.h1,
+                    "description": item.description || item.metaDescription,
+                    "provider": {
+                        "@type": "Organization",
+                        "name": "Digital Craft",
+                        "url": "https://digital-craft-tbilisi.netlify.app"
+                    },
+                    "areaServed": {
+                        "@type": "Country",
+                        "name": "Georgia"
+                    },
+                    "url": window.location.href
+                };
+            } else if (collection === 'portfolio') {
+                return {
+                    "@context": "https://schema.org",
+                    "@type": "CreativeWork",
+                    "name": item.title || item.h1,
+                    "description": item.description || item.metaDescription,
+                    "creator": {
+                        "@type": "Organization",
+                        "name": "Digital Craft"
+                    },
+                    "url": window.location.href
+                };
+            } else if (collection === 'blog') {
+                return {
+                    "@context": "https://schema.org",
+                    "@type": "BlogPosting",
+                    "headline": item.title || item.h1,
+                    "description": item.description || item.metaDescription,
+                    "author": {
+                        "@type": "Organization",
+                        "name": "Digital Craft"
+                    },
+                    "publisher": {
+                        "@type": "Organization",
+                        "name": "Digital Craft",
+                        "url": "https://digital-craft-tbilisi.netlify.app"
+                    },
+                    "url": window.location.href,
+                    "datePublished": item.datePublished || new Date().toISOString(),
+                    "dateModified": item.dateModified || new Date().toISOString()
+                };
+            }
+        }
+    }
+    
+    // Для главной страницы возвращаем null (уже есть в HTML)
+    return null;
 }
 
 async function seedDatabaseIfEmpty() { const homeDoc = await db.collection('home').doc('content').get(); if (!homeDoc.exists) { console.log("Database is empty. Seeding with initial data..."); const batch = db.batch(); batch.set(db.collection('home').doc('content'), initialSiteData.home); for (const key of ['services', 'portfolio', 'blog', 'contact']) { (initialSiteData[key] || []).forEach(item => { const { id, ...data } = item; batch.set(db.collection(key).doc(id), data); }); } await batch.commit(); console.log("Database seeded successfully."); } };

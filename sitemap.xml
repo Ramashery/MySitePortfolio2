@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    
+    <!-- Главная страница -->
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+        <xhtml:link rel="alternate" hreflang="en" href="https://digital-craft-tbilisi.netlify.app/"/>
+        <xhtml:link rel="alternate" hreflang="ka" href="https://digital-craft-tbilisi.netlify.app/ka/"/>
+        <xhtml:link rel="alternate" hreflang="ua" href="https://digital-craft-tbilisi.netlify.app/ua/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://digital-craft-tbilisi.netlify.app/ru/"/>
+    </url>
+    
+    <!-- Языковые версии главной страницы -->
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/en/</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <xhtml:link rel="alternate" hreflang="en" href="https://digital-craft-tbilisi.netlify.app/en/"/>
+        <xhtml:link rel="alternate" hreflang="ka" href="https://digital-craft-tbilisi.netlify.app/ka/"/>
+        <xhtml:link rel="alternate" hreflang="ua" href="https://digital-craft-tbilisi.netlify.app/ua/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://digital-craft-tbilisi.netlify.app/ru/"/>
+    </url>
+    
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/ka/</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <xhtml:link rel="alternate" hreflang="en" href="https://digital-craft-tbilisi.netlify.app/en/"/>
+        <xhtml:link rel="alternate" hreflang="ka" href="https://digital-craft-tbilisi.netlify.app/ka/"/>
+        <xhtml:link rel="alternate" hreflang="ua" href="https://digital-craft-tbilisi.netlify.app/ua/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://digital-craft-tbilisi.netlify.app/ru/"/>
+    </url>
+    
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/ua/</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <xhtml:link rel="alternate" hreflang="en" href="https://digital-craft-tbilisi.netlify.app/en/"/>
+        <xhtml:link rel="alternate" hreflang="ka" href="https://digital-craft-tbilisi.netlify.app/ka/"/>
+        <xhtml:link rel="alternate" hreflang="ua" href="https://digital-craft-tbilisi.netlify.app/ua/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://digital-craft-tbilisi.netlify.app/ru/"/>
+    </url>
+    
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/ru/</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <xhtml:link rel="alternate" hreflang="en" href="https://digital-craft-tbilisi.netlify.app/en/"/>
+        <xhtml:link rel="alternate" hreflang="ka" href="https://digital-craft-tbilisi.netlify.app/ka/"/>
+        <xhtml:link rel="alternate" hreflang="ua" href="https://digital-craft-tbilisi.netlify.app/ua/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://digital-craft-tbilisi.netlify.app/ru/"/>
+    </url>
+    
+    <!-- Основные разделы -->
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/#services</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/#portfolio</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/#blog</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://digital-craft-tbilisi.netlify.app/#contact</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+</urlset>
