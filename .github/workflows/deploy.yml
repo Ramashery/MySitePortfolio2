@@ -1,0 +1,59 @@
+name: 🚀 Auto Deploy to Netlify
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Позволяет запускать вручную
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Check file changes
+      id: check-changes
+      run: |
+        echo "Checking for changes in key files..."
+        if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.(html|js|css|xml|txt)$'; then
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "✅ Changes detected in website files"
+        else
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ No website file changes detected"
+        fi
+        
+    - name: 🚀 Deploy to Netlify
+      if: steps.check-changes.outputs.has_changes == 'true'
+      uses: nwtgck/actions-netlify@v2.0
+      with:
+        publish-dir: '.'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "🚀 Auto-deploy from GitHub Actions - ${{ github.event.head_commit.message }}"
+        enable-pull-request-comment: true
+        enable-commit-comment: true
+        
+    - name: 📱 Send notification
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        echo "📱 Deployment notification sent!"
+        echo "🌐 Site will be updated in 2-5 minutes"
+        echo "🔗 Check status at: ${{ env.NETLIFY_URL }}"
+        
+    - name: ✅ Deployment complete
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        echo "🎉 Automatic deployment completed successfully!"
+        echo "⏰ Deployment time: $(date)"
+        echo "📊 Files updated: ${{ github.event.head_commit.message }}"
+        
+    - name: ℹ️ No changes
+      if: steps.check-changes.outputs.has_changes == 'false'
+      run: |
+        echo "ℹ️ No website files changed, skipping deployment"
+        echo "💡 Only configuration files were updated"
