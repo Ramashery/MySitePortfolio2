@@ -1,22 +1,17 @@
-# Настройки для Netlify
 [build]
-  command = "npm run build"
-  publish = "dist/"
-  functions = "netlify/functions/"
+  publish = "."
+  functions = "netlify/functions"
+  command = ""
 
-[dev]
-  command = "npm run dev"
-  targetPort = 3000
-
-# Настройки среды
+# Настройки для SEO пререндеринга
 [build.environment]
   NODE_VERSION = "18"
 
-# Заголовки для SEO ботов
+# Перенаправления для SEO ботов
 [[redirects]]
-  from = "/.netlify/functions/renderer"
+  from = "/*"
+  to = "/.netlify/functions/seo-renderer"
   status = 200
-  force = true
   conditions = {Role = ["bot"]}
 
 # Перенаправления для обычных пользователей
@@ -24,51 +19,92 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false
   conditions = {Role = ["!bot"]}
 
-# Заголовки для статичных ресурсов
+# Заголовки для статических ресурсов
 [[headers]]
-  for = "/*.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjp|png|svg|webp)"
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Заголовки для изображений
+[[headers]]
+  for = "*.jpg"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/*.(woff|woff2)"
+  for = "*.jpeg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.gif"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Заголовки для CSS и JS
+[[headers]]
+  for = "*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     X-Content-Type-Options = "nosniff"
 
 [[headers]]
-  for = "/*.js"
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+# Заголовки для шрифтов
+[[headers]]
+  for = "*.woff"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     X-Content-Type-Options = "nosniff"
 
 [[headers]]
-  for = "/*.css"
+  for = "*.woff2"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     X-Content-Type-Options = "nosniff"
 
 # Заголовки для HTML страниц
 [[headers]]
-  for = "/*.html"
+  for = "*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+    X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
+# Заголовки для главной страницы
 [[headers]]
   for = "/"
   [headers.values]
     Cache-Control = "public, max-age=300, must-revalidate"
+    X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Заголовки для Sitemap.xml
+# Заголовки для sitemap
 [[headers]]
   for = "/sitemap.xml"
   [headers.values]
@@ -93,10 +129,11 @@
 [[headers]]
   for = "/admin.html"
   [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
     X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "no-cache, no-store, must-revalidate"
 
 # Перенаправления для SEO
 [[redirects]]
@@ -105,7 +142,7 @@
   status = 301
 
 [[redirects]]
-  from = "/news"
+  from = "/index"
   to = "/"
   status = 301
 

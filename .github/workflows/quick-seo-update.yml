@@ -1,0 +1,88 @@
+name: ⚡ Быстрое обновление SEO
+
+on:
+  workflow_dispatch:
+    inputs:
+      update_type:
+        description: 'Тип обновления'
+        required: true
+        default: 'seo'
+        type: choice
+        options:
+        - seo
+        - force
+        - test
+      message:
+        description: 'Сообщение об обновлении'
+        required: false
+        default: 'Быстрое обновление SEO системы'
+        type: string
+
+jobs:
+  quick-update:
+    runs-on: ubuntu-latest
+    name: ⚡ Быстрое обновление
+    
+    steps:
+      - name: 📥 Загрузка кода
+        uses: actions/checkout@v4
+      
+      - name: 🔄 Подготовка к обновлению
+        run: |
+          echo "🔄 Подготавливаю быстрое обновление..."
+          echo "📅 Время: $(date)"
+          echo "🎯 Тип: ${{ github.event.inputs.update_type }}"
+          echo "💬 Сообщение: ${{ github.event.inputs.message }}"
+      
+      - name: 📦 Установка Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📥 Установка зависимостей
+        run: |
+          echo "📦 Устанавливаю зависимости..."
+          npm ci
+          echo "✅ Зависимости установлены"
+      
+      - name: 🚀 Принудительный деплой на Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: '.'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "⚡ ${{ github.event.inputs.message }} - $(date)"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+      
+      - name: 🎉 Успешное обновление
+        run: |
+          echo "🎉 БЫСТРОЕ ОБНОВЛЕНИЕ ЗАВЕРШЕНО!"
+          echo "=================================="
+          echo "✅ Статус: Успешно"
+          echo "⏰ Время: $(date)"
+          echo "🎯 Тип: ${{ github.event.inputs.update_type }}"
+          echo "💬 Сообщение: ${{ github.event.inputs.message }}"
+          echo "🌐 Сайт: Обновится в течение 2-5 минут"
+          echo "📱 Проверьте статус в Netlify!"
+      
+      - name: 🔗 Получение URL деплоя
+        id: netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: '.'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 📊 Итоговая сводка
+        run: |
+          echo "📊 ИТОГОВАЯ СВОДКА"
+          echo "==================="
+          echo "✅ Статус: Завершено успешно"
+          echo "⏰ Время: $(date)"
+          echo "🎯 Тип обновления: ${{ github.event.inputs.update_type }}"
+          echo "💬 Сообщение: ${{ github.event.inputs.message }}"
+          echo "🌐 Сайт: Автоматически обновится"
+          echo "📱 Проверьте: Панель Netlify"
+          echo "🚀 Деплой: Завершен"
