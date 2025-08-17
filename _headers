@@ -62,7 +62,7 @@
   Cache-Control: no-cache, no-store, must-revalidate
 
 # Заголовки для улучшения Core Web Vitals
-*.html
+/*.html
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   X-XSS-Protection: 1; mode=block
