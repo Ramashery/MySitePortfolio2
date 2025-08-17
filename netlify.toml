@@ -1,6 +1,25 @@
 [build]
   publish = "."
+  functions = "netlify/functions"
   command = ""
+
+# Настройки для пререндеринга
+[build.environment]
+  NODE_VERSION = "18"
+
+# Перенаправления для SEO ботов
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/renderer"
+  status = 200
+  conditions = {Role = ["bot"]}
+
+# Перенаправления для обычных пользователей
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["!bot"]}
 
 # Заголовки для статических ресурсов
 [[headers]]
@@ -44,22 +63,26 @@
   for = "*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
 
 # Заголовки для шрифтов
 [[headers]]
   for = "*.woff"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "*.woff2"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
 
 # Заголовки для HTML страниц
 [[headers]]
