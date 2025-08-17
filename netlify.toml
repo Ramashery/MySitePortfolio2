@@ -1,4 +1,116 @@
+# Настройки для Netlify
+[build]
+  command = "npm run build"
+  publish = "dist/"
+  functions = "netlify/functions/"
+
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+
+# Настройки среды
+[build.environment]
+  NODE_VERSION = "18"
+
+# Заголовки для SEO ботов
+[[redirects]]
+  from = "/.netlify/functions/renderer"
+  status = 200
+  force = true
+  conditions = {Role = ["bot"]}
+
+# Перенаправления для обычных пользователей
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+  conditions = {Role = ["!bot"]}
+
+# Заголовки для статичных ресурсов
 [[headers]]
-  for = "/assets/*" # Укажите путь к вашим JS, CSS, картинкам, шрифтам
+  for = "/*.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjp|png|svg|webp)"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.(woff|woff2)"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+# Заголовки для HTML страниц
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Заголовки для Sitemap.xml
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+    Content-Type = "application/xml"
+
+# Заголовки для robots.txt
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+    Content-Type = "text/plain"
+
+# Заголовки для webmanifest
+[[headers]]
+  for = "/site.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+    Content-Type = "application/manifest+json"
+
+# Заголовки для админ-панели
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Перенаправления для SEO
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/news"
+  to = "/"
+  status = 301
+
+# Обработка 404 ошибок
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
