@@ -1,0 +1,11 @@
+{
+  "name": "my-site-portfolio",
+  "version": "1.0.0",
+  "description": "My portfolio website with SEO prerendering",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required for static assets, functions will be deployed automatically.'"
+  },
+  "author": "Ramashery",
+  "license": "ISC"
+}
