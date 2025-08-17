@@ -1,43 +1,19 @@
-# Правило по умолчанию для HTML страниц: не кешировать надолго.
+# Правила по умолчанию для HTML страниц: не кешировать надолго.
 # Это важно, чтобы пользователи всегда видели свежую версию страницы.
 /*
   Cache-Control: public, max-age=0, must-revalidate
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  X-XSS-Protection: 1; mode=block
-  Referrer-Policy: strict-origin-when-cross-origin
-
-# Главная страница - кешируем на короткое время для SEO
-/
-  Cache-Control: public, max-age=300, must-revalidate
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  X-XSS-Protection: 1; mode=block
-  Referrer-Policy: strict-origin-when-cross-origin
-
-# Sitemap и robots.txt - кешируем на среднее время
-/sitemap.xml
-  Cache-Control: public, max-age=86400, must-revalidate
-  Content-Type: application/xml
-
-/robots.txt
-  Cache-Control: public, max-age=86400, must-revalidate
-  Content-Type: text/plain
 
 # Правила для статичных файлов: кешировать "навечно".
 # Если вы измените файл, Netlify автоматически изменит его хеш, так что проблем не будет.
 /*.css
   Cache-Control: public, max-age=31536000, immutable
-  X-Content-Type-Options: nosniff
 
 /*.js
   Cache-Control: public, max-age=31536000, immutable
-  X-Content-Type-Options: nosniff
 
 # Для всех популярных форматов изображений
 /*.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjp|png|svg|webp)
   Cache-Control: public, max-age=31536000, immutable
-  X-Content-Type-Options: nosniff
 
 # Для всех популярных форматов шрифтов
 /*.(woff|woff2)
