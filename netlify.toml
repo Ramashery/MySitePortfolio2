@@ -145,9 +145,3 @@
   from = "/index"
   to = "/"
   status = 301
-
-# Обработка 404 ошибок
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
