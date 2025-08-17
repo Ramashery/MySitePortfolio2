@@ -7,14 +7,14 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Перенаправления для SEO ботов
+# Перенаправления для SEO ботов (приоритет выше)
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/seo-renderer"
   status = 200
   conditions = {Role = ["bot"]}
 
-# Перенаправления для обычных пользователей
+# Перенаправления для обычных пользователей (приоритет ниже)
 [[redirects]]
   from = "/*"
   to = "/index.html"
