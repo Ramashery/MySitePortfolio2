@@ -3,14 +3,14 @@
   functions = "netlify/functions"
   command = ""
 
-# Настройки для пререндеринга
+# Настройки для SEO пререндеринга
 [build.environment]
   NODE_VERSION = "18"
 
 # Перенаправления для SEO ботов
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/renderer"
+  to = "/.netlify/functions/seo-renderer"
   status = 200
   conditions = {Role = ["bot"]}
 

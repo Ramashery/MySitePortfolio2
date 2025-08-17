@@ -1,7 +1,7 @@
 {
-  "name": "digital-craft-seo-renderer",
+  "name": "digital-craft-seo-prerenderer",
   "version": "1.0.0",
-  "description": "Dynamic SEO rendering for Digital Craft website",
+  "description": "SEO prerendering system for Digital Craft website",
   "main": "index.html",
   "scripts": {
     "build": "echo 'No build step required'",
@@ -19,10 +19,10 @@
   },
   "keywords": [
     "seo",
+    "prerendering",
     "netlify",
     "firebase",
-    "spa",
-    "prerendering"
+    "spa"
   ],
   "author": "Digital Craft Team",
   "license": "MIT"
